@@ -1,0 +1,38 @@
+<Project>
+  <PropertyGroup Label="UserMacros">
+    <!-- iprj\build\vs2022\consts.props -> up 3 levels is edrav2 root -->
+    <CmdRootDir Condition="'$(CmdRootDir)' == ''">$(MSBuildThisFileDirectory)..\..\..\</CmdRootDir>
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros">
+    <CmdOutDirName>win-$(Configuration)-$(PlatformName)</CmdOutDirName>
+  </PropertyGroup>
+
+  <PropertyGroup Label="UserMacros">
+    <CmdEPrjDir>$(CmdRootDir)eprj</CmdEPrjDir>
+    <CmdIPrjDir>$(CmdRootDir)iprj</CmdIPrjDir>
+    <CmdPropsDir>$(CmdRootDir)iprj\build\vs2022</CmdPropsDir>
+    <CmdILibDir>$(CmdRootDir)out\lib\$(CmdOutDirName)</CmdILibDir>
+    <CmdAtsScenarios>$(CmdRootDir)iprj\ats\scenarios</CmdAtsScenarios>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <BuildMacro Include="CmdRootDir">
+      <Value>$(CmdRootDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CmdEPrjDir">
+      <Value>$(CmdEPrjDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CmdIPrjDir">
+      <Value>$(CmdIPrjDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CmdPropsDir">
+      <Value>$(CmdPropsDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CmdILibDir">
+      <Value>$(CmdILibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CmdAtsScenarios">
+      <Value>$(CmdAtsScenarios)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

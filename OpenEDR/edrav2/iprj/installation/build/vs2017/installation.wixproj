@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="WixToolset.Sdk/6.0.2>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <Platforms>x86;x64</Platforms>
+    <ProjectGuid>6c957042-f2be-441c-9cd7-589f51f0d842</ProjectGuid>
+    <OutputName>installation</OutputName>
+    <OutputType>Package</OutputType>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <VerboseOutput>true</VerboseOutput>
+    <HarvestDirectoryGenerateGuidsNow>true</HarvestDirectoryGenerateGuidsNow>
+    <HarvestDirectorySuppressFragments>true</HarvestDirectorySuppressFragments>
+    <HarvestDirectorySuppressRegistry>true</HarvestDirectorySuppressRegistry>
+    <HarvestDirectorySuppressRootDirectory>true</HarvestDirectorySuppressRootDirectory>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PlatformName Condition=" '$(Platform)' == 'x86' ">Win32</PlatformName>
+    <PlatformName Condition=" '$(Platform)' == 'x64' ">x64</PlatformName>
+  </PropertyGroup>
+
+  <Import Project="..\..\..\build\vs2017\consts.props" />
+
+  <PropertyGroup>
+    <OutputPath>$(CmdRootDir)\out\install\$(CmdOutDirName)\</OutputPath>
+    <IntermediateOutputPath>$(CmdRootDir)\out\temp\$(CmdOutDirName)\$(OutputName)\</IntermediateOutputPath>
+    <DefineConstants>BIN_PATH=$(CmdRootDir)\out\bin\;OUT_DIR_NAME=$(CmdOutDirName)\;SourceBinDir=$(CmdRootDir)\out\srcBinInstall\$(CmdOutDirName)\</DefineConstants>
+    <IncludeSearchPaths>..\..\src</IncludeSearchPaths>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\src\Product.wxs">
+      <Link>Product.wxs</Link>
+    </Compile>
+    <Compile Include="$(IntermediateOutputPath)BinaryFiles.wxs">
+      <Link>BinaryFiles.wxs</Link>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\src\Define.wxi">
+      <Link>Define.wxi</Link>
+    </Content>
+    <Content Include="..\..\src\BuildInfo.wxi">
+      <Link>BuildInfo.wxi</Link>
+    </Content>
+    <Content Include="..\..\src\InstallSequence.wxi">
+      <Link>InstallSequence.wxi</Link>
+    </Content>
+    <Content Include="..\..\src\util.js">
+      <Link>util.js</Link>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <BindPath Include="..\..\src" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Firewall.wixext" Version="6.0.2 />
+    <PackageReference Include="WixToolset.Heat" Version="6.0.2 />
+  </ItemGroup>
+
+  <Target Name="PrepareInstallationPayload" BeforeTargets="CoreCompile">
+    <Exec Command='if exist "$(CmdRootDir)\out\srcBinInstall\$(CmdOutDirName)" rd "$(CmdRootDir)\out\srcBinInstall\$(CmdOutDirName)" /S /Q' />
+    <Exec Command='md "$(CmdRootDir)\out\srcBinInstall\$(CmdOutDirName)"' />
+    <Exec Command='xcopy "$(CmdRootDir)\out\bin\$(CmdOutDirName)" "$(CmdRootDir)\out\srcBinInstall\$(CmdOutDirName)" /Q /E /I /Exclude:$(ProjectDir)..\..\src\exclude.list' />
+    <Exec Command='FOR /r "$(CmdRootDir)\out\srcBinInstall\$(CmdOutDirName)" %%i in (*.cfg, *.qsc, ptm.*, evm.*, policy.l?c) do "$(CmdRootDir)\out\bin\$(CmdOutDirName)\edrcon.exe" file encrypt -f "%%~i" -o "%%~i.new" -e aes' />
+    <Exec Command='FOR /r "$(CmdRootDir)\out\srcBinInstall\$(CmdOutDirName)" %%i in (*.new) do del "%%~dpni" /F /Q &amp; ren "%%~i" "%%~ni"' />
+    <HeatDirectory
+      ToolPath="$(HeatToolDir)"
+      Directory="$(CmdRootDir)\out\srcBinInstall\$(CmdOutDirName)"
+      OutputFile="$(IntermediateOutputPath)BinaryFiles.wxs"
+      GenerateGuidsNow="true"
+      SuppressFragments="true"
+      SuppressRegistry="true"
+      ComponentGroupName="BinaryFiles"
+      PreprocessorVariable="var.SourceBinDir"
+      SuppressRootDirectory="true"
+      DirectoryRefId="INSTALLDIR" />
+  </Target>
+</Project>

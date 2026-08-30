@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util"
+     xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+	<?include Define.wxi ?>
+	<?include BuildInfo.wxi ?>
+
+	<Bundle Name="HydraDragonAntivirus"
+	        Version="$(var.strversion)"
+	        Manufacturer="HydraDragonAntivirus"
+	        UpgradeCode="19B8FF2D-16B0-4E76-9395-C05FE4BEA8D7">
+
+		<BootstrapperApplication>
+			<bal:WixStandardBootstrapperApplication Theme="hyperlinkLicense" LicenseUrl="" />
+		</BootstrapperApplication>
+
+		<Chain>
+			<!-- Main OpenEDR MSI package -->
+			<MsiPackage Id="EdrAgentMsi" SourceFile="$(var.MsiPath)" Vital="yes" />
+		</Chain>
+	</Bundle>
+</Wix>
